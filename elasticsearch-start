@@ -41,3 +41,11 @@ restart)
 esac
 
 exit $?
+
+保存退出，赋予执行权限
+chmod +x es
+
+添加到开机启动任务
+chkconfig -add es
+
+使用service es start/stop/restart来操作

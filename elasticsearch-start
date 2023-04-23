@@ -1,0 +1,43 @@
+在/etc/init.d目录下新建文件es
+#!/bin/sh
+#chkconfig: 2345 80 05
+#description: elasticsearch
+ 
+export JAVA_HOME=/usr/local/jdk8u222-b10
+export JAVA_BIN=/usr/local/jdk8u222-b10/bin
+export PATH=$PATH:$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+export JAVA_HOME JAVA_BIN PATH CLASSPATH
+es_home=/home/gw/module/elasticsearch-6.8.8
+
+case "$1" in
+start)
+#下面的“<<!”是切换用户后，待执行的命令，执行完后使用“!”来进行结束
+    su gw<<!
+    cd $es_home
+    ./bin/elasticsearch -d
+!
+#上面的“!”是以上面的对应起来，并且顶格放置，这是语法
+    echo "elasticsearch startup"  
+    ;;  
+stop)
+    es_pid=`ps aux|grep elasticsearch | grep -v 'grep elasticsearch' | awk '{print $2}'`
+    kill -9 $es_pid
+    echo "elasticsearch stopped"
+    ;;  
+restart)
+    es_pid=`ps aux|grep elasticsearch | grep -v 'grep elasticsearch' | awk '{print $2}'`
+    kill -9 $es_pid
+    echo "elasticsearch stopped"
+    su xingdu<<!
+    cd /home/elasticsearch
+    ./bin/elasticsearch -d
+!
+    echo "elasticsearch startup"
+    ;;  
+*)
+    echo "start|stop|restart"
+    ;;  
+esac
+
+exit $?
